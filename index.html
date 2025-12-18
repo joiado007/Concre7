@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Concre7</title>
+    <title>Concre7 - Calculadora de Pavers</title>
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#0F172A" />
@@ -14,51 +14,170 @@
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/192/1063/1063376.png" />
     <link rel="manifest" href="manifest.json" />
 
+    <!-- Estilos e Fontes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        -webkit-tap-highlight-color: transparent;
-        /* Prevent bounce effect on mobile */
-        overscroll-behavior-y: contain;
-      }
-      input[type="number"]::-webkit-inner-spin-button,
-      input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-      /* PWA Safe Area for newer devices */
-      .safe-area-bottom {
-        padding-bottom: env(safe-area-inset-bottom);
-      }
-    </style>
-    <script type="importmap">
-    {
-      "imports": {
-        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-        "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-        "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-        "react/": "https://esm.sh/react@^19.2.3/",
-        "react": "https://esm.sh/react@^19.2.3"
-      }
-    }
-    </script>
-  </head>
-  <body class="bg-slate-50 text-slate-900">
-    <div id="root"></div>
     
-    <script>
-      // Register Service Worker for PWA
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./service-worker.js')
-            .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
-            .catch(err => console.log('Falha ao registrar Service Worker:', err));
-        });
-      }
-    </script>
-  </body>
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; }
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .nav-btn.active { color: #F97316; }
+        .nav-btn.active svg { fill: #F97316; stroke: none; }
+    </style>
+
+    <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+</head>
+<body class="bg-slate-50 text-slate-900 selection:bg-orange-100">
+    <div class="flex flex-col min-h-screen max-w-md mx-auto bg-white shadow-xl relative">
+        
+        <!-- Header -->
+        <header class="bg-slate-900 text-white p-6 pb-10 rounded-b-[2.5rem] shadow-lg sticky top-0 z-30">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-orange-500 p-2.5 rounded-2xl shadow-lg shadow-orange-500/20">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v2z"/><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M4 15v-3a6 6 0 0 1 12 0v3"/><path d="m12 10 3 3"/><path d="m12 10-3 3"/></svg>
+                    </div>
+                    <h1 class="text-2xl font-black tracking-tight">Concre7</h1>
+                </div>
+                <div class="bg-slate-800 text-[10px] px-3 py-1 rounded-full text-slate-400 font-bold uppercase tracking-widest">v2.1.0</div>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">Cálculo profissional de pavimentação.</p>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-6 -mt-8 pb-32 z-20">
+            
+            <!-- Tab: Calculator -->
+            <div id="calculator-tab" class="tab-content active space-y-6">
+                <!-- Model Selection -->
+                <section class="space-y-3">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Modelo de Paver</label>
+                    <div id="model-list" class="grid grid-cols-2 gap-3">
+                        <!-- Injected by JS -->
+                    </div>
+                </section>
+
+                <!-- Inputs -->
+                <section class="bg-white rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 border border-slate-100 space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Área da Obra (m²)</label>
+                        <div class="relative">
+                            <input type="number" id="area-input" placeholder="0.00" class="w-full text-5xl font-bold p-0 pb-2 border-b-2 border-slate-100 focus:border-orange-500 outline-none transition-all placeholder:text-slate-100" />
+                            <span class="absolute right-0 bottom-4 text-slate-300 font-bold text-xl">m²</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <div class="flex-1 space-y-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Margem de Perda</label>
+                            <select id="margin-select" class="w-full p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold text-slate-700 appearance-none focus:ring-2 focus:ring-orange-500/20 transition-all">
+                                <option value="0">0% (Justo)</option>
+                                <option value="5" selected>5% (Padrão)</option>
+                                <option value="10">10% (Recortes)</option>
+                                <option value="15">15% (Complexo)</option>
+                            </select>
+                        </div>
+                        <div class="flex-1 space-y-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Preço/Peça</label>
+                            <div id="unit-price-display" class="w-full p-4 bg-slate-50 rounded-2xl font-bold text-slate-700">R$ 1,10</div>
+                        </div>
+                    </div>
+
+                    <button id="calculate-btn" class="w-full py-5 bg-orange-500 hover:bg-orange-600 active:scale-[0.97] text-white font-black rounded-2xl shadow-xl shadow-orange-500/30 transition-all flex items-center justify-center gap-3">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                        GERAR ORÇAMENTO
+                    </button>
+                </section>
+
+                <!-- Results Area -->
+                <div id="result-view" class="hidden animate-in fade-in slide-in-from-bottom-8 duration-500 space-y-4">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Tab: History -->
+            <div id="history-tab" class="tab-content space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-black text-slate-800 tracking-tight">Histórico</h2>
+                    <button id="clear-history-btn" class="text-[10px] font-bold text-slate-400 hover:text-red-500 uppercase tracking-widest">Limpar Tudo</button>
+                </div>
+                <div id="history-items" class="space-y-3">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Tab: Settings -->
+            <div id="settings-tab" class="tab-content space-y-6">
+                <h2 class="text-xl font-black text-slate-800 tracking-tight">Ajustes</h2>
+                
+                <div class="space-y-4">
+                    <div class="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm space-y-4">
+                        <div class="flex items-center gap-2">
+                            <div class="text-orange-500">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">Preço Unitário do Paver</h3>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="relative flex-1">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-300">R$</span>
+                                <input type="number" id="settings-price-input" step="0.01" class="w-full pl-12 pr-4 py-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-orange-500 outline-none font-bold text-slate-800 transition-all" />
+                            </div>
+                            <button id="save-price-btn" class="px-6 bg-slate-900 text-white rounded-2xl font-bold active:scale-95 transition-all">Salvar</button>
+                        </div>
+                        <p class="text-[10px] text-slate-400 font-medium leading-relaxed">Este valor altera o cálculo de orçamentos em todo o aplicativo.</p>
+                    </div>
+
+                    <div class="p-6 bg-slate-900 rounded-3xl text-white">
+                        <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4">Informações Técnicas</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-400">Modelo Padrão</span>
+                                <span class="font-bold">24 x 10 x 6 cm</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-400">Peças por m²</span>
+                                <span class="font-bold">42 unidades</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Tab Navigation -->
+        <nav class="bg-white/80 backdrop-blur-lg border-t border-slate-100 px-8 py-4 flex justify-between items-center fixed bottom-0 w-full max-w-md safe-area-bottom z-50">
+            <button data-target="calculator" class="nav-btn active flex flex-col items-center gap-1.5 transition-all">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                <span class="text-[9px] font-black uppercase tracking-widest">Cálculo</span>
+            </button>
+            <button data-target="history" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-slate-400">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                <span class="text-[9px] font-black uppercase tracking-widest">Histórico</span>
+            </button>
+            <button data-target="settings" class="nav-btn flex flex-col items-center gap-1.5 transition-all text-slate-400">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span class="text-[9px] font-black uppercase tracking-widest">Ajustes</span>
+            </button>
+        </nav>
+    </div>
+
+    <script type="module" src="index.js"></script>
+</body>
 </html>

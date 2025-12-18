@@ -2,8 +2,8 @@
 {
   "name": "Concre7 - Calculadora de Pavers",
   "short_name": "Concre7",
-  "description": "Calculadora profissional de pavers para obras e orçamentos rápidos.",
-  "start_url": "./",
+  "description": "Cálculo profissional de pavers e orçamentos de pavimentação.",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0F172A",
   "theme_color": "#F97316",
